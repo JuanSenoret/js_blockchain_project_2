@@ -47,7 +47,6 @@ class Blockchain {
     }
     // Check the call is not comming from constructor
     if(newBlock.body != "Genesis block") {
-      console.log('Add new block');
       await this.getBlockHeight()
       .then((height) => {
         newBlock.height = height + 1;
@@ -114,7 +113,7 @@ class Blockchain {
     .then((value) => {
       block = JSON.parse(value);
     }).catch((err) => {
-      console.log("Previous Block not found. Error: " + err);
+      console.log("Block not found to induce error. Error: " + err);
     });
     if(block) {
       block.data = 'induced chain error';
@@ -268,69 +267,47 @@ class Blockchain {
 }
 
 // ----------------Test--------------------------------
-// Instantiate blockchain with blockchain variable
-let blockchain = new Blockchain();
-// Create Blockchain
-function createBlockChain(maxBlockNumber) {
-  return new Promise(function(resolve) {
-    (function theLoop (i) {
-      setTimeout(function () {
-          let blockTest = new Block("Test Block - " + (i + 1));
-          console.log('value is ', i);
-          //blockchain.addBlock(blockTest);
-          i++;
-          if (i < maxBlockNumber) {
-            theLoop(i);
-          }
-          if( i == maxBlockNumber) {
-            resolve();
-          }
-      }, 2000);
-    })(0);
-  });
-}
-function createBlockChain_v2(maxBlockNumber) {
-  return new Promise(function(resolve) {
-    for(var i = 0; i < 5; i++){
-      (function(i){
-          setTimeout(function(){
-              console.log('value is ', i);
-              if (i == 4) {
-                resolve();
-              }
-          }, 3000);
-      })(i);
-    }
-  });
-}
 // Function to performe the test
 async function test(startTest, maxBlockNumber, inducedErrorBlocks) {
+  const blockchain = new Blockchain();
   if(startTest) {
-    await createBlockChain(maxBlockNumber).then(() => {
-      console.log('test 2');
+    // Check if chain exist
+    let chainLength = 0;
+    // Get the length of the current chain
+    await blockchain.getBlockHeight()
+    .then((height) => {
+      chainLength = height+1;
+    })
+    .catch((height, err) => {
+      console.log('Error getting block height. Error: ' + err);
     });
-    /* else {
-      console.log('Blockchain already created');
-      
-      // Valididate Chain
-      console.log('------- Start Blockchain validation ---------');
-      await blockchain.validateChain();
-      console.log('------- End Blockchain validation ---------');
-      // Induce errors by changing block data
-      console.log('Induce errors by changing block data');
-      for (var i = 0; i < inducedErrorBlocks.length; i++) {
-        await blockchain.induceErrorInBlock(inducedErrorBlocks[i]);
+    // If chain is empty let's add some test blocks to the chain
+    if(chainLength < 2) {
+      console.log('Chain is empty');
+      console.log('------- Adding Test Blocks to the chain ---------');
+      for(i = 0; i < maxBlockNumber; i++) {
+        const blockTest = new Block("Test Block - " + (i + 1));
+        await blockchain.addBlock(blockTest);
       }
-      // Valididate Chain after error introduced
-      console.log('------- Start Blockchain validation ---------');
-      await blockchain.validateChain();
-      console.log('------- End Blockchain validation ---------');
-      
-    }*/
+      console.log('------- Test Blocks already added to the chain ---------');
+    }
+    // Valididate Chain
+    console.log('------- Start Blockchain validation ---------');
+    await blockchain.validateChain();
+    console.log('------- End Blockchain validation ---------');
+    // Induce errors by changing block data
+    console.log('Induce errors by changing block data');
+    for (var i = 0; i < inducedErrorBlocks.length; i++) {
+      await blockchain.induceErrorInBlock(inducedErrorBlocks[i]);
+    }
+    // Valididate Chain after error introduced
+    console.log('------- Start Blockchain validation ---------');
+    await blockchain.validateChain();
+    console.log('------- End Blockchain validation ---------');
   }
 }
 // Start Test:
 // First parameter if you want to performe the test
 // Second parameter: number of block in the chain
 // Thirs parameter: the block in which you want an error be induced
-test(true, 10, [2,4,10]);
+test(true, 10, [2,4,7]);

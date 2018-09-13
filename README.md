@@ -12,13 +12,17 @@ Installing Node and NPM is pretty straightforward using the installer package av
 
 ### Configuring your project
 
-- Install crypto-js with --save flag to save dependency to our package.json file
+- Clone the repository in your local environment
 ```
-npm install crypto-js --save
+git clone <url GitHuib Repo>
 ```
-- Install level with --save flag
+- Go to the porject folder
 ```
-npm install level --save
+cd <project name>
+```
+- Install the dependencies (crypto-js and level)
+```
+npm install
 ```
 
 ## Testing

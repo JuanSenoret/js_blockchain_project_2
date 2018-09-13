@@ -16,7 +16,7 @@ Installing Node and NPM is pretty straightforward using the installer package av
 ```
 git clone <url GitHuib Repo>
 ```
-- Go to the porject folder
+- Go to the project folder
 ```
 cd <project name>
 ```

@@ -37,13 +37,13 @@ class Blockchain {
     // Check if exist genesis block
     const exist = await this.existGenesisBlock();
     if(!exist) {
-      console.log('Add Genesis Block');
+      console.log('------ Adding Genesis Block --------');
       const genesisBlock = new Block("Genesis block");
       genesisBlock.height = 0;
       genesisBlock.time = new Date().getTime().toString().slice(0,-3);
       genesisBlock.hash = SHA256(JSON.stringify(genesisBlock)).toString();
       await this.addLevelDBData(genesisBlock.height, JSON.stringify(genesisBlock).toString());
-      console.log('Genesis Block already added');
+      console.log('------ Genesis Block already added ------');
     }
     // Check the call is not comming from constructor
     if(newBlock.body != "Genesis block") {
@@ -95,8 +95,7 @@ class Blockchain {
   async existGenesisBlock() {
     let exist = false;
     await this.getBlock(0)
-    .then((strBlock) => {
-      //console.log('Genesis block: ' + strBlock);
+    .then(() => {
       exist = true;
     })
     .catch((err) => {
@@ -148,7 +147,6 @@ class Blockchain {
           console.log('Block# ' + blockHeight + ' not found');
           reject(err);
         } else {
-          //console.log('Block# ' + blockHeight + ': ' + value);
           resolve(value);
         }
       });
@@ -206,7 +204,6 @@ class Blockchain {
       let validityBlock = false;
       await this.validateBlock(i)
       .then((value) => {
-        //console.log('Block# ' + i + ' validity: ' + value);
         validityBlock = value;
       })
       .catch((err) => {
@@ -237,15 +234,12 @@ class Blockchain {
         if(currentBlock && nextBlock) {
           const blockHash = currentBlock.hash;
           const previousHash = nextBlock.previousBlockHash;
-          //console.log('CHash: ' + blockHash);
-          //console.log('PHash: ' + previousHash);
           if(blockHash !== previousHash) {
             isCurrentBlockHashEqualNextBlockPrevHash = false;
           }
         }
       }
       const newPromise = new Promise(function(resolve) {
-        //console.log('Block# '+ i +' ValidityBlock: ' + validityBlock + ' | isCurrentBlockHashEqualNextBlockPrevHash: ' + isCurrentBlockHashEqualNextBlockPrevHash);
         if(!validityBlock || !isCurrentBlockHashEqualNextBlockPrevHash) {
           errorLog.push(i);
         }
@@ -268,7 +262,7 @@ class Blockchain {
 
 // ----------------Test--------------------------------
 // Function to performe the test
-async function test(startTest, maxBlockNumber, inducedErrorBlocks) {
+async function test(startTest=true, maxBlockNumber=10, inducedErrorBlocks=[2,4,7]) {
   const blockchain = new Blockchain();
   if(startTest) {
     // Check if chain exist
@@ -289,9 +283,9 @@ async function test(startTest, maxBlockNumber, inducedErrorBlocks) {
         const blockTest = new Block("Test Block - " + (i + 1));
         await blockchain.addBlock(blockTest);
       }
-      console.log('------- Test Blocks already added to the chain ---------');
+      console.log('------- Test Blocks already added to the chain --------');
     }
-    // Valididate Chain
+    // Valididate chain
     console.log('------- Start Blockchain validation ---------');
     await blockchain.validateChain();
     console.log('------- End Blockchain validation ---------');
@@ -300,14 +294,14 @@ async function test(startTest, maxBlockNumber, inducedErrorBlocks) {
     for (var i = 0; i < inducedErrorBlocks.length; i++) {
       await blockchain.induceErrorInBlock(inducedErrorBlocks[i]);
     }
-    // Valididate Chain after error introduced
+    // Valididate chain after error introduced
     console.log('------- Start Blockchain validation ---------');
     await blockchain.validateChain();
     console.log('------- End Blockchain validation ---------');
   }
 }
 // Start Test:
-// First parameter if you want to performe the test
-// Second parameter: number of block in the chain
-// Thirs parameter: the block in which you want an error be induced
-test(true, 10, [2,4,7]);
+// First parameter: true if you want to performe the test; pro default true
+// Second parameter: number of block in the chain; pro default 10
+// Thirs parameter: the block in which you want an error be induced: pro default [2,4,7]
+test(true, 10, [2,4,8]);

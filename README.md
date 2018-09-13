@@ -28,11 +28,11 @@ npm install
 ## Testing
 
 To test code:
-1: Open the file simpleChain.js
-2: At the end of the file you will find the call to the test() function.
-3: First parameter: true if you want to performe the test; pro default true
-4: Second parameter: number of block in the chain; pro default 10
-5: Thirs parameter: the block in which you want an error be induced: pro default [2,4,7]
+- Open the file simpleChain.js
+- At the end of the file you will find the call to the test() function.
+- First parameter: true if you want to performe the test; pro default true
+- Second parameter: number of block in the chain; pro default 10
+- Thirs parameter: the block in which you want an error be induced: pro default [2,4,7]
 ```
 node simpleChain.js
 ```
